@@ -86,16 +86,18 @@ export const CardObj = () => {
             // let programId = Keypair.fromSecretKey(Uint8Array.from([17,14,180,44,177,24,37,109,72,145,17,236,128,87,95,76,161,56,213,239,247,226,233,154,190,154,5,156,31,84,223,252,251,103,241,37,107,31,214,135,216,57,176,104,181,34,239,0,87,5,238,213,82,233,24,5,207,38,196,99,148,115,117,192]));
             // console.log(programId.publicKey.toBase58())
             // console.log(programId.secretKey);
-            let connection = new Connection("https://api.devnet.solana.com", "confirmed");
+            // let connection = new Connection("https://api.devnet.solana.com", "confirmed");
 
-            let addr = window.solana.publicKey;
-            let mintAccount = new PublicKey('3rMQDQrKkvFLkm4rcYhCr2wTD2mzm3bWFyrZi3UpzhF2')
+            // let addr = window.solana.publicKey;
+            // let mintAccount = new PublicKey('3rMQDQrKkvFLkm4rcYhCr2wTD2mzm3bWFyrZi3UpzhF2')
             
             // let token = await connection.getTokenAccountsByOwner(addr, {
             //     mint: mintAccount
             // })
-            let token = await (new SPLToken.Token(connection, null, SPLToken.TOKEN_PROGRAM_ID, null)).getAccountInfo(addr)
-            console.log(token)
+            // let token = await connection.getAccountInfo(addr, {
+            //     mint: mintAccount
+            // })
+            // console.log(token)
             // let token = new SPLToken.Token(connection, '5WpTCGrmvuaVKnKVqHNcdDuAgxUEz7UvrqGELtpGKCxA', SPLToken.TOKEN_PROGRAM_ID, null);
             // let tokenInfo = await token.getMintInfo();
             // console.log(tokenInfo);
