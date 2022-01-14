@@ -386,7 +386,7 @@ export const CardObj = () => {
             <CustomButton style={{ marginTop: '50px' }} value={address ? address.slice(0, 4) + "....." + address.slice(-3) : "Connect wallet"} onClick={handleConnectWallet} />
             <div className={styles.card}>
                 <div className={styles.title}>Stake NFT get BONGOS</div>
-                <img src="./assets/img/nft.png" alt="nft" />
+                <img src="assets/img/nft.png" alt="nft" />
                 <CustomButton value="Pick NFT" onClick={onClickPick} />
                 <div className={styles.box}>
                     <h5>Reward</h5>
