@@ -15,7 +15,7 @@ import axios from 'axios'
 import { CustomButton } from "../../components/CustomButton";
 import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL, SystemProgram, TransactionInstruction, SYSVAR_RENT_PUBKEY, Transaction } from '@solana/web3.js';
 import { programs } from "@metaplex/js"
-
+import avatar from './nft.png'
 
 const style = {
     position: 'absolute',
@@ -391,7 +391,7 @@ export const CardObj = () => {
             <CustomButton style={{ marginTop: '50px' }} value={address ? address.slice(0, 4) + "....." + address.slice(-3) : "Connect wallet"} onClick={handleConnectWallet} />
             <div className={styles.card}>
                 <div className={styles.title}>Stake NFT get BONGOS</div>
-                <img src="../../assets/img/nft.png" alt="nft" />
+                <img src={avatar} alt="nft" />
                 <CustomButton value="Pick NFT" onClick={onClickPick} />
                 <div className={styles.box}>
                     <h5>Reward</h5>
