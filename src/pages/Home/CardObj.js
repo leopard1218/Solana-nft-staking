@@ -9,13 +9,13 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import styles from './Home.module.sass';
 import axios from 'axios'
 import { CustomButton } from "../../components/CustomButton";
 import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL, SystemProgram, TransactionInstruction, SYSVAR_RENT_PUBKEY, Transaction } from '@solana/web3.js';
-import * as SPLToken from "@solana/spl-token";
-import { publicKey } from "@project-serum/anchor/dist/cjs/utils";
+import { programs } from "@metaplex/js"
+
 
 const style = {
     position: 'absolute',
@@ -86,21 +86,26 @@ export const CardObj = () => {
             // let programId = Keypair.fromSecretKey(Uint8Array.from([17,14,180,44,177,24,37,109,72,145,17,236,128,87,95,76,161,56,213,239,247,226,233,154,190,154,5,156,31,84,223,252,251,103,241,37,107,31,214,135,216,57,176,104,181,34,239,0,87,5,238,213,82,233,24,5,207,38,196,99,148,115,117,192]));
             // console.log(programId.publicKey.toBase58())
             // console.log(programId.secretKey);
-            // let connection = new Connection("https://api.devnet.solana.com", "confirmed");
+            let connection = new Connection("https://api.devnet.solana.com", "confirmed");
 
-            // let addr = window.solana.publicKey;
-            // let mintAccount = new PublicKey('3rMQDQrKkvFLkm4rcYhCr2wTD2mzm3bWFyrZi3UpzhF2')
-            
+            let addr = window.solana.publicKey;
+            let mintAccount = new PublicKey('5WpTCGrmvuaVKnKVqHNcdDuAgxUEz7UvrqGELtpGKCxA')
+
             // let token = await connection.getTokenAccountsByOwner(addr, {
             //     mint: mintAccount
             // })
-            // let token = await connection.getAccountInfo(addr, {
-            //     mint: mintAccount
-            // })
-            // console.log(token)
-            // let token = new SPLToken.Token(connection, '5WpTCGrmvuaVKnKVqHNcdDuAgxUEz7UvrqGELtpGKCxA', SPLToken.TOKEN_PROGRAM_ID, null);
-            // let tokenInfo = await token.getMintInfo();
-            // console.log(tokenInfo);
+            let token = await connection.getParsedTokenAccountsByOwner(addr, {
+                programId: TOKEN_PROGRAM_ID
+                // programId: new PublicKey("4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes")
+            })
+            console.log(token.value.map(v => ({
+                mint: v.account.data.parsed.info.mint,
+                tokenAmount: v.account.data.parsed.info.tokenAmount,
+                tokenAccount: v.pubkey.toString(),
+                owner: v.account.owner.toString()
+            })))
+            const tokenMetadata = programs.metadata.Metadata.findByOwnerV2(connection, addr);
+            console.log(JSON.stringify(tokenMetadata));
 
             // getDerivedAccountAddress();
             // console.log(getConnection())
@@ -386,7 +391,7 @@ export const CardObj = () => {
             <CustomButton style={{ marginTop: '50px' }} value={address ? address.slice(0, 4) + "....." + address.slice(-3) : "Connect wallet"} onClick={handleConnectWallet} />
             <div className={styles.card}>
                 <div className={styles.title}>Stake NFT get BONGOS</div>
-                <img src="assets/img/nft.png" alt="nft" />
+                <img src="../../../assets/img/nft.png" alt="nft" />
                 <CustomButton value="Pick NFT" onClick={onClickPick} />
                 <div className={styles.box}>
                     <h5>Reward</h5>
