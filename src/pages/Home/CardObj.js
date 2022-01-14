@@ -15,8 +15,9 @@ import axios from 'axios'
 import { CustomButton } from "../../components/CustomButton";
 import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL, SystemProgram, TransactionInstruction, SYSVAR_RENT_PUBKEY, Transaction } from '@solana/web3.js';
 import { programs } from "@metaplex/js"
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import avatar from './nft.png'
-
+let connection
 const style = {
     position: 'absolute',
     top: '50%',
@@ -53,7 +54,7 @@ export const CardObj = () => {
         });
     }
     const getBalance = async () => {
-        let connection = getConnection();
+        connection = getConnection();
         const res = await connection.getBalance(getPublicKey());
         // console.log(res);
         setWalletBalance(res);
@@ -76,36 +77,36 @@ export const CardObj = () => {
         // Check if phantom is installed or not and prompt to install it.
         if (window.solana && window.solana.isPhantom) {
             await connectToWallet();
-
+            connection = getConnection()
             // update address and balance of the wallet
             setAddress(window.solana.publicKey.toString());
-            getBalance();
+            // getBalance();
 
 
             //----test-----
             // let programId = Keypair.fromSecretKey(Uint8Array.from([17,14,180,44,177,24,37,109,72,145,17,236,128,87,95,76,161,56,213,239,247,226,233,154,190,154,5,156,31,84,223,252,251,103,241,37,107,31,214,135,216,57,176,104,181,34,239,0,87,5,238,213,82,233,24,5,207,38,196,99,148,115,117,192]));
             // console.log(programId.publicKey.toBase58())
             // console.log(programId.secretKey);
-            let connection = new Connection("https://api.devnet.solana.com", "confirmed");
-
-            let addr = window.solana.publicKey;
-            let mintAccount = new PublicKey('5WpTCGrmvuaVKnKVqHNcdDuAgxUEz7UvrqGELtpGKCxA')
 
             // let token = await connection.getTokenAccountsByOwner(addr, {
             //     mint: mintAccount
             // })
-            let token = await connection.getParsedTokenAccountsByOwner(addr, {
-                programId: TOKEN_PROGRAM_ID
-                // programId: new PublicKey("4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes")
-            })
-            console.log(token.value.map(v => ({
-                mint: v.account.data.parsed.info.mint,
-                tokenAmount: v.account.data.parsed.info.tokenAmount,
-                tokenAccount: v.pubkey.toString(),
-                owner: v.account.owner.toString()
-            })))
-            const tokenMetadata = programs.metadata.Metadata.findByOwnerV2(connection, addr);
-            console.log(JSON.stringify(tokenMetadata));
+            // let token = await connection.getParsedTokenAccountsByOwner(addr, {
+            //     programId: TOKEN_PROGRAM_ID
+            //     // programId: new PublicKey("4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes")
+            // })
+            // console.log(token.value.map(v => ({
+            //     mint: v.account.data.parsed.info.mint,
+            //     tokenAmount: v.account.data.parsed.info.tokenAmount,
+            //     tokenAccount: v.pubkey.toString(),
+            //     owner: v.account.owner.toString()
+            // })))
+            // const tokenMetadata = programs.metadata.Metadata.findByOwnerV2(connection, addr);
+            // console.log(JSON.stringify(tokenMetadata));
+            // const tokenMint = '5WpTCGrmvuaVKnKVqHNcdDuAgxUEz7UvrqGELtpGKCxA';
+            // const metadataPDA = await Metadata.getPDA(new PublicKey(tokenMint));
+            // const tokenMetadataJson = await Metadata.load(connection, metadataPDA);
+            // console.log(tokenMetadataJson.data);
 
             // getDerivedAccountAddress();
             // console.log(getConnection())
@@ -126,16 +127,16 @@ export const CardObj = () => {
         return (
             <ImageList sx={{ width: 'auto', height: 450, padding: '50px' }} cols={4}>
                 {props.itemData.map((item, key) => (
-                    <div className={selectedNFT.includes(item.tokenId) ? styles.active : ""} key={key}>
-                        <ImageListItem onClick={(event) => clickHandler(event, item.tokenId)}>
+                    <div className={selectedNFT.includes(item.name) ? styles.active : ""} key={key}>
+                        <ImageListItem onClick={(event) => clickHandler(event, item.name)}>
                             <div className={styles.image_card}>
                                 <img
                                     src={item.img}
-                                    alt={item.title}
+                                    alt={item.name}
                                     loading="lazy"
                                 />
                                 <ImageListItemBar
-                                    title={item.title}
+                                    title={item.name}
                                     position="below"
                                 />
                             </div>
@@ -147,6 +148,8 @@ export const CardObj = () => {
     }
 
     const onClickStake = async () => {
+
+
 
         // for (let i = 0; i < selectedNFT.length; i++) {
         //     selectedNFT[i] = selectedNFT[i] - 0;
@@ -244,51 +247,82 @@ export const CardObj = () => {
     }, [])
 
     const onClickPick = async () => {
-        // setStakeState(true);
-        // setSelectedNFT([]);
-        // const web3 = new Web3(Web3.givenProvider);
-        // let nftContract;
-        // try {
-        //     const chainId = await web3.eth.getChainId()
-        //     if (chainId === netchainId) {
-        //         const web3Modal = new Web3Modal();
-        //         const connection = await web3Modal.connect();
-        //         const provider = new ethers.providers.Web3Provider(connection);
-        //         const signer = provider.getSigner();
-        //         myAddr = signer.provider.provider.selectedAddress;
-        //         console.log(myAddr)
-        //         nftContract = new ethers.Contract(
-        //             CrocosNFTAddr,
-        //             CrocosNFTCont.abi,
-        //             provider
-        //         );
-        //         // const balance = await nftContract.balanceOf(myAddr);
-        //         const walletOfOwner = await nftContract.walletOfOwner(myAddr);
-        //         const tokenData = [];
-        //         for (var i = 0; i < walletOfOwner.length; i++) {
-        //             let tokenURI = await nftContract.tokenURI(walletOfOwner[i] - 0);
-        //             // tokenURI = tokenURI.slice(0, 82)
-        //             const nftMetaData = await axios.get(tokenURI);
-        //             console.log(nftMetaData)
-        //             const nftTokenData = { img: `https://ipfs.io/ipfs/${nftMetaData.data.image.slice(7)}`, title: nftMetaData.data.name, tokenId: walletOfOwner[i] }
-        //             tokenData.push(nftTokenData);
-        //         }
-        //         setTokensOfOwner(tokenData);
-        //         console.log(tokenData)
-        //         setOpen(true)   
-        //     } else {
-        //         try {
-        //             await web3.currentProvider.request({
-        //                 method: "wallet_switchEthereumChain",
-        //                 params: [{ chainId: netchainIdHex }]
-        //             });
-        //         } catch (error) {
-        //             console.log(error.message);
-        //         }
-        //     }
-        // } catch (err) {
-        //     console.log(err)
-        // }
+        if (address) {
+            let token = await connection.getParsedTokenAccountsByOwner(new PublicKey(address), {
+                programId: TOKEN_PROGRAM_ID
+                // programId: new PublicKey("4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes")
+            })
+            const tokenInfo = token.value.map(v => ({
+                mint: v.account.data.parsed.info.mint,
+                tokenAmount: v.account.data.parsed.info.tokenAmount,
+                tokenAccount: v.pubkey.toString(),
+                owner: v.account.owner.toString()
+            }))
+
+            const mintAddress = tokenInfo.map(token => (token.mint))
+            console.log(mintAddress)
+            const tokenData = [];
+            for (let i = 0; i < mintAddress.length - 1; i++) {
+                const metadataPDA = await Metadata.getPDA(new PublicKey(mintAddress[i]));
+                const tokenMetadataJson = await Metadata.load(connection, metadataPDA);
+                // console.log(tokenMetadataJson.data.data);
+                const nftMetaData = await axios.get(tokenMetadataJson.data.data.uri);
+                console.log(nftMetaData)
+                const nftTokenData = { img: nftMetaData.data.image, symbol: nftMetaData.data.symbol, name: nftMetaData.data.name }
+                tokenData.push(nftTokenData);
+            }
+            setTokensOfOwner(tokenData);
+            setStakeState(true)
+            setSelectedNFT([]);
+            setOpen(true)
+            // setStakeState(true);
+            // setSelectedNFT([]);
+            // const web3 = new Web3(Web3.givenProvider);
+            // let nftContract;
+            // try {
+            //     const chainId = await web3.eth.getChainId()
+            //     if (chainId === netchainId) {
+            //         const web3Modal = new Web3Modal();
+            //         const connection = await web3Modal.connect();
+            //         const provider = new ethers.providers.Web3Provider(connection);
+            //         const signer = provider.getSigner();
+            //         myAddr = signer.provider.provider.selectedAddress;
+            //         console.log(myAddr)
+            //         nftContract = new ethers.Contract(
+            //             CrocosNFTAddr,
+            //             CrocosNFTCont.abi,
+            //             provider
+            //         );
+            //         // const balance = await nftContract.balanceOf(myAddr);
+            //         const walletOfOwner = await nftContract.walletOfOwner(myAddr);
+            //         const tokenData = [];
+            //         for (var i = 0; i < walletOfOwner.length; i++) {
+            //             let tokenURI = await nftContract.tokenURI(walletOfOwner[i] - 0);
+            //             // tokenURI = tokenURI.slice(0, 82)
+            //             const nftMetaData = await axios.get(tokenURI);
+            //             console.log(nftMetaData)
+            //             const nftTokenData = { img: `https://ipfs.io/ipfs/${nftMetaData.data.image.slice(7)}`, title: nftMetaData.data.name, tokenId: walletOfOwner[i] }
+            //             tokenData.push(nftTokenData);
+            //         }
+            //         setTokensOfOwner(tokenData);
+            //         console.log(tokenData)
+            //         setOpen(true)   
+            //     } else {
+            //         try {
+            //             await web3.currentProvider.request({
+            //                 method: "wallet_switchEthereumChain",
+            //                 params: [{ chainId: netchainIdHex }]
+            //             });
+            //         } catch (error) {
+            //             console.log(error.message);
+            //         }
+            //     }
+            // } catch (err) {
+            //     console.log(err)
+            // }
+        } else {
+            toastErr("Please connect Phantom wallet.")
+        }
 
     }
 
