@@ -1,0 +1,59 @@
+staking (harvest) commands
+
+spl-token create-token --decimals 0
+
+spl-token create-account 4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes
+
+spl-token mint 4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes 100000
+
+change admin and reward_mint in contract
+
+cargo build-bpf
+
+only for demonstration
+solana-keygen new -o /home/myname/solana/harvesting-contract/target/deploy/staking-keypair.json --force
+
+change reward_mint and program_id in client
+
+run commands bellow in client directory:
+cargo build
+
+periods in seconds
+cargo run -- generate_vault_address -e dev -s /home/sant/.config/solana/id.json --min_period 60 --reward_period 10
+
+spl-token transfer 4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes 100000 E4tYZtpoGjdxh5JdFBvhhkQLXBjukb8GrfYf7xLFaX7D --fund-recipient
+
+cargo run -- add_to_whitelist -e dev -s /home/sant/.config/solana/id.json --reward 1 --candy_machine q5gjNqtcoEiCZBAxbkgcj7bqrWkXMqq3cyQbmJQTBME
+
+cargo run -- stake -e dev -s /home/sant/.config/solana/id.json --nft CUCkHDgo6jq27fD6iZ9UVTnoB4B6R55oT5oNW2BHJbGj
+
+cargo run -- stake_withdraw -e dev -s /home/sant/.config/solana/id.json --nft CUCkHDgo6jq27fD6iZ9UVTnoB4B6R55oT5oNW2BHJbGj
+
+need to wait 60  seconds
+cargo run -- unstake -e dev -s /home/sant/.config/solana/id.json --nft CUCkHDgo6jq27fD6iZ9UVTnoB4B6R55oT5oNW2BHJbGj
+
+cargo run -- withdraw -e dev -s C:\Users\Admin\Documents\sol\dep1.json --amount 10
+
+
+
+Install solana tool:
+sh -c "$(curl -sSfL https://release.solana.com/v1.8.8/install)"
+
+Install Rust:
+https://www.rust-lang.org/tools/install
+
+Tools for C++:
+sudo apt install build-essential
+
+solana program deploy /home/sant/smartcontract/harvesting-contract/target/deploy/staking.so
+
+sudo apt install libudev-dev
+
+
+https://docs.solana.com/cli/deploy-a-program#closing-program-and-buffer-accounts-and-reclaiming-their-lamports
+
+wallet adapter
+
+
+
+

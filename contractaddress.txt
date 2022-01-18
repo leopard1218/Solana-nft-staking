@@ -1,0 +1,4 @@
+ let program_id = "HvPG27BZSHkuDGVDkwbDfoQ9caXmtRBXnZPvFbZJ6fzf"
+ let reward_mint = "4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes"
+
+let nft program id = "3rMQDQrKkvFLkm4rcYhCr2wTD2mzm3bWFyrZi3UpzhF2"
