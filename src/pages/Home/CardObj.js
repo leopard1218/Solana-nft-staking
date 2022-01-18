@@ -13,11 +13,31 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import styles from './Home.module.sass';
 import axios from 'axios'
 import { CustomButton } from "../../components/CustomButton";
-import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL, SystemProgram, TransactionInstruction, SYSVAR_RENT_PUBKEY, Transaction } from '@solana/web3.js';
+import {
+    Keypair,
+    Connection,
+    PublicKey,
+    LAMPORTS_PER_SOL,
+    SystemProgram,
+    TransactionInstruction,
+    Transaction,
+    SYSVAR_RENT_PUBKEY,
+    sendAndConfirmTransaction,
+} from '@solana/web3.js';
+
 import { programs } from "@metaplex/js"
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import avatar from './nft.png'
+import {
+    establishConnection,
+    establishPayer,
+    checkProgram,
+    sayHello,
+    reportGreetings,
+} from './stake.ts';
+const STAKING_SEED = 'sign';
 let connection
+let stakePubkey: PublicKey;
 const style = {
     position: 'absolute',
     top: '50%',
@@ -27,7 +47,20 @@ const style = {
     border: '2px solid #000',
     boxShadow: 24,
 };
+/**
+ * Borsh schema definition for greeting accounts
+ */
+// const GreetingSchema = new Map([
+//     [GreetingAccount, { kind: 'struct', fields: [['counter', 'u32']] }],
+// ]);
 
+// /**
+//  * The expected size of each greeting account.
+//  */
+// const GREETING_SIZE = borsh.serialize(
+//     GreetingSchema,
+//     new GreetingAccount(),
+// ).length;
 export const CardObj = () => {
 
     const [open, setOpen] = useState(false);
@@ -81,7 +114,24 @@ export const CardObj = () => {
             // update address and balance of the wallet
             setAddress(window.solana.publicKey.toString());
             // getBalance();
+            // console.log("Let's say hello to a Solana account...");
 
+            // // Establish connection to the cluster
+            // await establishConnection();
+
+            // // Determine who pays for the fees
+            // await establishPayer();
+
+            // // Check if the program has been deployed
+            // await checkProgram();
+
+            // // Say hello to an account
+            // await sayHello();
+
+            // // Find out how many times that account has been greeted
+            // await reportGreetings();
+
+            // console.log('Success');
 
             //----test-----
             // let programId = Keypair.fromSecretKey(Uint8Array.from([17,14,180,44,177,24,37,109,72,145,17,236,128,87,95,76,161,56,213,239,247,226,233,154,190,154,5,156,31,84,223,252,251,103,241,37,107,31,214,135,216,57,176,104,181,34,239,0,87,5,238,213,82,233,24,5,207,38,196,99,148,115,117,192]));
@@ -148,7 +198,57 @@ export const CardObj = () => {
     }
 
     const onClickStake = async () => {
+        let programId = Keypair.fromSecretKey(Uint8Array.from([17, 14, 180, 44, 177, 24, 37, 109, 72, 145, 17, 236, 128, 87, 95, 76, 161, 56, 213, 239, 247, 226, 233, 154, 190, 154, 5, 156, 31, 84, 223, 252, 251, 103, 241, 37, 107, 31, 214, 135, 216, 57, 176, 104, 181, 34, 239, 0, 87, 5, 238, 213, 82, 233, 24, 5, 207, 38, 196, 99, 148, 115, 117, 192]));
+        console.log(programId.publicKey.toBase58())
+        // console.log(Buffer.alloc(1, 1))
+        let payer = Keypair.generate()
+        const signature = await connection.requestAirdrop(payer.publicKey, LAMPORTS_PER_SOL);
+        await connection.confirmTransaction(signature);
+        console.log(payer)
+        let balance = await connection.getBalance(payer.publicKey);
+        console.log(balance)
+        console.log(tokensOfOwner[0].metadata.toString())
+        stakePubkey = await PublicKey.createWithSeed(
+            payer.publicKey,
+            STAKING_SEED,
+            programId.publicKey,
+        );
 
+        const transaction = new Transaction().add(
+            SystemProgram.createAccountWithSeed({
+                fromPubkey: payer.publicKey,
+                basePubkey: payer.publicKey,
+                seed: STAKING_SEED,
+                newAccountPubkey: stakePubkey,
+                lamports: balance/100,
+                space: 1000,
+                programId: programId.publicKey,
+            }),
+        );
+        await sendAndConfirmTransaction(connection, transaction, [payer]);
+        const instruction = new TransactionInstruction({
+            keys: [
+                { pubkey: payer.publicKey, isSigner: true, isWritable: true },
+                { pubkey: new PublicKey(tokensOfOwner[0].mint), isSigner: false, isWritable: false },
+                { pubkey: tokensOfOwner[0].metadata, isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'), isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: stakePubkey, isSigner: false, isWritable: false },
+                { pubkey: new PublicKey("SysvarRent111111111111111111111111111111111"), isSigner: false, isWritable: false },
+                { pubkey: new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"), isSigner: false, isWritable: false }
+            ],
+            programId: programId.publicKey,
+            data: Buffer.alloc(0), // All instructions are hellos
+        });
+        await sendAndConfirmTransaction(
+            connection,
+            new Transaction().add(instruction),
+            [payer],
+        );
 
 
         // for (let i = 0; i < selectedNFT.length; i++) {
@@ -249,8 +349,9 @@ export const CardObj = () => {
     const onClickPick = async () => {
         if (address) {
             let token = await connection.getParsedTokenAccountsByOwner(new PublicKey(address), {
-                programId: TOKEN_PROGRAM_ID
-                // programId: new PublicKey("4dLEZ8B3MfA3iuHqX5zdUDvbFJ4w8ENfvTVHxcLMZbes")
+                programId: TOKEN_PROGRAM_ID,
+                // mint: new PublicKey("3rMQDQrKkvFLkm4rcYhCr2wTD2mzm3bWFyrZi3UpzhF2")
+                // programId: new PublicKey(address)
             })
             const tokenInfo = token.value.map(v => ({
                 mint: v.account.data.parsed.info.mint,
@@ -268,7 +369,7 @@ export const CardObj = () => {
                 // console.log(tokenMetadataJson.data.data);
                 const nftMetaData = await axios.get(tokenMetadataJson.data.data.uri);
                 console.log(nftMetaData)
-                const nftTokenData = { img: nftMetaData.data.image, symbol: nftMetaData.data.symbol, name: nftMetaData.data.name }
+                const nftTokenData = { img: nftMetaData.data.image, symbol: nftMetaData.data.symbol, name: nftMetaData.data.name, mint: mintAddress[i], metadata: metadataPDA }
                 tokenData.push(nftTokenData);
             }
             setTokensOfOwner(tokenData);
